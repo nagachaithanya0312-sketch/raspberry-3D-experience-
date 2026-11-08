@@ -22,14 +22,16 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Build static site
         run: bun run build
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+      - name: Verify static entry point
+        run: test -f dist/client/index.html
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v3
         with:
