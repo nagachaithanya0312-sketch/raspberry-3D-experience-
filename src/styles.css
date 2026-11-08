@@ -11,6 +11,8 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@import "./styles/site.css";
+
 /*
  * Design system definition.
  *
