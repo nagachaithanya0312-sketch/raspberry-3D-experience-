@@ -51,6 +51,10 @@ body:has(.raspberry-studio) {
   opacity: 0;
 }
 
+.studio-loading.done {
+  opacity: 0;
+}
+
 .studio-fallback {
   position: absolute;
   width: min(60vw, 44rem);

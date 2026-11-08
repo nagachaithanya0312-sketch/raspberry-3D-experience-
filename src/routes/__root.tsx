@@ -81,11 +81,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Raspberry Studio — Interactive 3D Lighting" },
+      {
+        name: "description",
+        content: "Explore and shape a photorealistic raspberry with an interactive 3D lighting studio.",
+      },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Raspberry Studio — Interactive 3D Lighting" },
+      {
+        property: "og:description",
+        content: "Explore and shape a photorealistic raspberry with an interactive 3D lighting studio.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },

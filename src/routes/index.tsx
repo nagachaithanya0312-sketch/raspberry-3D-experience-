@@ -82,19 +82,23 @@ function Index() {
     renderer.onload = () => {
       if (cancelled) return;
       const readyCheck = window.setInterval(() => {
-        if (window.raspberry) {
+        const loadingStatus = document.getElementById("loading")?.textContent ?? "";
+        if (document.getElementById("loading")?.classList.contains("done")) {
           window.clearInterval(readyCheck);
           setSceneReady(true);
+        } else if (loadingStatus.startsWith("failed to load:")) {
+          window.clearInterval(readyCheck);
+          setSceneError(true);
         }
       }, 100);
-      window.setTimeout(() => window.clearInterval(readyCheck), 12_000);
+      window.setTimeout(() => window.clearInterval(readyCheck), 45_000);
     };
     renderer.onerror = () => setSceneError(true);
     container.appendChild(renderer);
 
     const timeoutId = window.setTimeout(() => {
       if (!window.raspberry && !cancelled) setSceneError(true);
-    }, 15_000);
+    }, 50_000);
 
     return () => {
       cancelled = true;
@@ -107,7 +111,7 @@ function Index() {
   return (
     <main className="raspberry-studio" ref={containerRef}>
       <canvas id="app" aria-label="Interactive 3D raspberry lighting studio" />
-      <div className={`studio-loading${sceneReady ? " studio-loading--hidden" : ""}`}>
+      <div id="loading" className={`studio-loading${sceneReady ? " studio-loading--hidden" : ""}`}>
         <img
           className="studio-fallback"
           src={fallbackImage.url}
