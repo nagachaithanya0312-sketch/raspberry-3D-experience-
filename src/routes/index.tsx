@@ -1,39 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 
-import aoRoughThick from "@/assets/site/ao_rough_thick.ktx2.asset.json";
-import albedo from "@/assets/site/albedo.ktx2.asset.json";
-import detailNormal from "@/assets/site/detail_normal.ktx2.asset.json";
-import fallbackImage from "@/assets/site/raspberry-reference.webp.asset.json";
 import normalOs from "@/assets/site/normal_os.ktx2.asset.json";
-import raspberryFuzz from "@/assets/site/raspberry_fuzz.bin.asset.json";
-import raspberryModel from "@/assets/site/raspberry.glb.asset.json";
-import transfer0 from "@/assets/site/transfer_sh0.ktx2.asset.json";
-import transfer1 from "@/assets/site/transfer_sh1.ktx2.asset.json";
-import transfer2 from "@/assets/site/transfer_sh2.ktx2.asset.json";
-import transfer3 from "@/assets/site/transfer_sh3.ktx2.asset.json";
-import transfer4 from "@/assets/site/transfer_sh4.ktx2.asset.json";
-import transfer5 from "@/assets/site/transfer_sh5.ktx2.asset.json";
-import transfer6 from "@/assets/site/transfer_sh6.ktx2.asset.json";
-import transfer7 from "@/assets/site/transfer_sh7.ktx2.asset.json";
-import transfer8 from "@/assets/site/transfer_sh8.ktx2.asset.json";
 
 const raspberryAssetUrls = {
-  "raspberry.glb": raspberryModel.url,
-  "raspberry_fuzz.bin": raspberryFuzz.url,
-  "albedo.ktx2": albedo.url,
-  "normal_os.ktx2": normalOs.url,
-  "ao_rough_thick.ktx2": aoRoughThick.url,
-  "detail_normal.ktx2": detailNormal.url,
-  "transfer_sh0.ktx2": transfer0.url,
-  "transfer_sh1.ktx2": transfer1.url,
-  "transfer_sh2.ktx2": transfer2.url,
-  "transfer_sh3.ktx2": transfer3.url,
-  "transfer_sh4.ktx2": transfer4.url,
-  "transfer_sh5.ktx2": transfer5.url,
-  "transfer_sh6.ktx2": transfer6.url,
-  "transfer_sh7.ktx2": transfer7.url,
-  "transfer_sh8.ktx2": transfer8.url,
+  "raspberry.glb": `${import.meta.env.BASE_URL}site-assets/raspberry.glb`,
+  "raspberry_fuzz.bin": `${import.meta.env.BASE_URL}site-assets/raspberry_fuzz.bin`,
+  "albedo.ktx2": `${import.meta.env.BASE_URL}site-assets/albedo.ktx2`,
+  "normal_os.ktx2": new URL(
+    normalOs.url,
+    `https://${normalOs.project_id}.lovableproject.com`,
+  ).href,
+  "ao_rough_thick.ktx2": `${import.meta.env.BASE_URL}site-assets/ao_rough_thick.ktx2`,
+  "detail_normal.ktx2": `${import.meta.env.BASE_URL}site-assets/detail_normal.ktx2`,
+  "transfer_sh0.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh0.ktx2`,
+  "transfer_sh1.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh1.ktx2`,
+  "transfer_sh2.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh2.ktx2`,
+  "transfer_sh3.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh3.ktx2`,
+  "transfer_sh4.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh4.ktx2`,
+  "transfer_sh5.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh5.ktx2`,
+  "transfer_sh6.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh6.ktx2`,
+  "transfer_sh7.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh7.ktx2`,
+  "transfer_sh8.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh8.ktx2`,
 } satisfies Record<string, string>;
 
 declare global {
@@ -74,7 +62,7 @@ function Index() {
 
     let cancelled = false;
     window.__RASPBERRY_ASSETS__ = Object.fromEntries(
-      Object.entries(raspberryAssetUrls).map(([file, url]) => [file, new URL(url, window.location.href).href]),
+      Object.entries(raspberryAssetUrls).map(([file, url]) => [file, url]),
     );
     const renderer = document.createElement("script");
     renderer.src = `${import.meta.env.BASE_URL}site-assets/raspberry-studio.js`;
@@ -114,7 +102,7 @@ function Index() {
       <div id="loading" className={`studio-loading${sceneReady ? " studio-loading--hidden" : ""}`}>
         <img
           className="studio-fallback"
-          src={fallbackImage.url}
+          src={`${import.meta.env.BASE_URL}site-assets/raspberry-reference.webp`}
           alt="A close-up, photorealistic red raspberry on black"
           width={640}
           height={780}
