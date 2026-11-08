@@ -28,3 +28,7 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Imported site rendering
+
+- Keep the Raspberry studio renderer and decoder/media payloads under `public/site-assets`, while route UI and lifecycle remain in React, so the original browser-only scene stays isolated from SSR.
