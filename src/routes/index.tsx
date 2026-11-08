@@ -67,7 +67,6 @@ function Index() {
   const containerRef = useRef<HTMLElement>(null);
   const [sceneReady, setSceneReady] = useState(false);
   const [sceneError, setSceneError] = useState(false);
-  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -103,7 +102,7 @@ function Index() {
       delete window.__RASPBERRY_ASSETS__;
       renderer.remove();
     };
-  }, [retryKey]);
+  }, []);
 
   return (
     <main className="raspberry-studio" ref={containerRef}>
