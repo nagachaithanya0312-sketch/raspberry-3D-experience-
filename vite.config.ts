@@ -10,10 +10,10 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 const githubPagesBasePath = "/raspberry-3D-experience-";
-const isGithubPagesBuild = process.env.GITHUB_PAGES === "true";
+const isGithubPagesBuild = process.env["GITHUB_PAGES"] === "true";
 
 export default defineConfig({
-  base: isGithubPagesBuild ? `${githubPagesBasePath}/` : "/",
+  vite: { base: isGithubPagesBuild ? `${githubPagesBasePath}/` : "/" },
   tanstackStart: {
     ...(isGithubPagesBuild
       ? {
