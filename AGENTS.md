@@ -32,3 +32,4 @@ use the editor.
 ## Imported site rendering
 
 - Keep the Raspberry studio renderer and decoder/media payloads under `public/site-assets`, while route UI and lifecycle remain in React, so the original browser-only scene stays isolated from SSR.
+- GitHub Pages builds must prerender the studio into static output, use the repository base path, and deploy through the official Pages Actions artifact workflow rather than relying on server runtime output.

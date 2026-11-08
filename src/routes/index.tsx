@@ -77,7 +77,7 @@ function Index() {
       Object.entries(raspberryAssetUrls).map(([file, url]) => [file, new URL(url, window.location.href).href]),
     );
     const renderer = document.createElement("script");
-    renderer.src = "/site-assets/raspberry-studio.js";
+    renderer.src = `${import.meta.env.BASE_URL}site-assets/raspberry-studio.js`;
     renderer.type = "module";
     renderer.onload = () => {
       if (cancelled) return;
