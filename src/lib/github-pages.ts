@@ -1,0 +1,1 @@
+export const githubPagesBasePath = "/raspberry-3D-experience-";
