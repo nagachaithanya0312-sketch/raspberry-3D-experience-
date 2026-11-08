@@ -1,0 +1,1 @@
+The Raspberry source page injects its full lil-gui and custom renderer CSS from its compiled browser bundle. See public/site-assets/raspberry-studio.js. The original source bundle was captured from https://raspberry.luruke.com/assets/index-DQDjxRl6.js.
