@@ -31,6 +31,6 @@ use the editor.
 
 ## Fruit studio rendering
 
-- Keep the current Papaya studio and its controls in React; retain the Raspberry renderer and payloads under `public/site-assets` as source assets, but do not load them in the Papaya route.
+- Keep the Papaya studio shell and controls in React, with its interactive Three.js scene isolated in a lazily loaded React Three Fiber module; retain Raspberry payloads under `public/site-assets` but do not load them in the Papaya route.
 - GitHub Pages builds must prerender the studio into static output, use the repository base path, and deploy through the official Pages Actions artifact workflow rather than relying on server runtime output.
 - Keep the repository’s GitHub Pages base path in one shared browser-safe constant so the Vite config and its regression test use the same value.
