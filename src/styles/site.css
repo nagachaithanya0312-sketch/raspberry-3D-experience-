@@ -5,6 +5,11 @@
   --papaya-line: oklch(0.36 0.02 76);
   --papaya-accent: oklch(0.78 0.16 66);
   --papaya-green: oklch(0.68 0.08 135);
+  --papaya-key-light: oklch(0.97 0.045 78);
+  --papaya-daylight: oklch(0.97 0.025 190);
+  --papaya-fill-light: oklch(0.45 0.035 75);
+  --papaya-bounce-light: oklch(0.82 0.035 180);
+  --papaya-shadow: oklch(0.08 0.01 50);
 }
 
 html:has(.papaya-studio),
@@ -107,8 +112,7 @@ body:has(.papaya-studio) {
   position: absolute;
   z-index: -1;
   inset: 8% 20%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, color-mix(in oklch, var(--papaya-accent), transparent 92%), transparent 68%);
+  border-top: 1px solid color-mix(in oklch, var(--papaya-line), transparent 88%);
   content: "";
   pointer-events: none;
 }
@@ -132,6 +136,67 @@ body:has(.papaya-studio) {
 
 .papaya-stage--cut .papaya-fruit img {
   width: min(63vw, 45rem);
+}
+
+.papaya-model-view {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.papaya-scene,
+.papaya-scene-placeholder {
+  position: absolute;
+  inset: 0;
+}
+
+.papaya-scene {
+  z-index: 1;
+  cursor: grab;
+  touch-action: none;
+}
+
+.papaya-scene:active {
+  cursor: grabbing;
+}
+
+.papaya-scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.papaya-model-fallback {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transition: opacity 400ms ease, visibility 400ms ease;
+}
+
+.papaya-model-fallback--hidden {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.papaya-model-loading {
+  position: absolute;
+  bottom: 12%;
+  color: var(--papaya-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.62rem;
+}
+
+.papaya-model-fallback--hidden .papaya-model-loading {
+  visibility: hidden;
+}
+
+.papaya-scene-placeholder {
+  pointer-events: none;
 }
 
 .papaya-studio:not(.papaya-studio--warm) .papaya-fruit img {
@@ -286,6 +351,12 @@ body:has(.papaya-studio) {
     transform: translateY(1.2rem);
   }
 
+  .papaya-model-fallback img {
+    width: min(95vw, 34rem);
+    height: 82%;
+    transform: translateY(1.2rem);
+  }
+
   .papaya-stage--cut .papaya-fruit img {
     width: min(110vw, 39rem);
     height: 74%;
@@ -312,7 +383,7 @@ body:has(.papaya-studio) {
 
   .papaya-control,
   .papaya-light-control {
-    min-height: 2.15rem;
+    min-height: 2.65rem;
     padding-inline: 0.6rem;
     font-size: 0.68rem;
   }
@@ -324,7 +395,8 @@ body:has(.papaya-studio) {
 
 @media (prefers-reduced-motion: reduce) {
   .papaya-studio,
-  .papaya-fruit img {
+  .papaya-fruit img,
+  .papaya-model-fallback {
     transition: none;
     animation: none;
   }
