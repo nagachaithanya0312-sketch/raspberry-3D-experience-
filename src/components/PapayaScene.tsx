@@ -31,12 +31,11 @@ interface PapayaSceneProps {
   onReady: () => void;
 }
 
-const papayaSeedPositions = Array.from({ length: 18 }, (_, index) => {
-  const row = Math.floor(index / 6);
-  const column = index % 6;
-  const rowOffset = row === 1 ? 0.08 : 0;
+const papayaSeedPositions = Array.from({ length: 28 }, (_, index) => {
+  const angle = index * 2.399963229728653;
+  const radius = Math.sqrt((index + 0.5) / 28);
 
-  return [-0.58 + column * 0.22 + rowOffset, (row - 1) * 0.12, 0.075] as [number, number, number];
+  return [Math.cos(angle) * radius * 0.56, Math.sin(angle) * radius * 0.22, 0.075] as [number, number, number];
 });
 
 function createPapayaCutFace() {
@@ -85,7 +84,8 @@ function PapayaCutaway({
     const transform = new Object3D();
     papayaSeedPositions.forEach(([x, y, z], index) => {
       transform.position.set(x, y, z);
-      transform.scale.set(0.075, 0.068, 0.052);
+      const size = 0.052 + (index % 4) * 0.004;
+      transform.scale.set(size, size * 0.92, size * 0.76);
       transform.updateMatrix();
       seeds.current?.setMatrixAt(index, transform.matrix);
     });
