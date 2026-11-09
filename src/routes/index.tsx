@@ -1,121 +1,97 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
-import normalOs from "@/assets/site/normal_os.ktx2.asset.json";
-
-const raspberryAssetUrls = {
-  "raspberry.glb": `${import.meta.env.BASE_URL}site-assets/raspberry.glb`,
-  "raspberry_fuzz.bin": `${import.meta.env.BASE_URL}site-assets/raspberry_fuzz.bin`,
-  "albedo.ktx2": `${import.meta.env.BASE_URL}site-assets/albedo.ktx2`,
-  "normal_os.ktx2": new URL(
-    normalOs.url,
-    `https://${normalOs.project_id}.lovableproject.com`,
-  ).href,
-  "ao_rough_thick.ktx2": `${import.meta.env.BASE_URL}site-assets/ao_rough_thick.ktx2`,
-  "detail_normal.ktx2": `${import.meta.env.BASE_URL}site-assets/detail_normal.ktx2`,
-  "transfer_sh0.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh0.ktx2`,
-  "transfer_sh1.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh1.ktx2`,
-  "transfer_sh2.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh2.ktx2`,
-  "transfer_sh3.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh3.ktx2`,
-  "transfer_sh4.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh4.ktx2`,
-  "transfer_sh5.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh5.ktx2`,
-  "transfer_sh6.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh6.ktx2`,
-  "transfer_sh7.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh7.ktx2`,
-  "transfer_sh8.ktx2": `${import.meta.env.BASE_URL}site-assets/transfer_sh8.ktx2`,
-} satisfies Record<string, string>;
-
-declare global {
-  interface Window {
-    __RASPBERRY_ASSETS__?: Record<string, string>;
-    raspberry?: unknown;
-  }
-}
+import { Button } from "@/components/ui/button";
+import papayaCut from "@/assets/papaya-cut.jpg";
+import papayaWhole from "@/assets/papaya-whole.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Raspberry Studio — Interactive 3D Lighting" },
+      { title: "Papaya Light Studio — Tropical Fruit Study" },
       {
         name: "description",
-        content: "Explore and shape a photorealistic raspberry with an interactive 3D lighting studio.",
+        content: "A tactile visual study of ripe papaya, natural color, and studio light.",
       },
-      { property: "og:title", content: "Raspberry Studio — Interactive 3D Lighting" },
+      { property: "og:title", content: "Papaya Light Studio — Tropical Fruit Study" },
       {
         property: "og:description",
-        content: "Explore and shape a photorealistic raspberry with an interactive 3D lighting studio.",
+        content: "A tactile visual study of ripe papaya, natural color, and studio light.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Index,
+  component: PapayaStudio,
 });
 
-function Index() {
-  const containerRef = useRef<HTMLElement>(null);
-  const [sceneReady, setSceneReady] = useState(false);
-  const [sceneError, setSceneError] = useState(false);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    let cancelled = false;
-    window.__RASPBERRY_ASSETS__ = Object.fromEntries(
-      Object.entries(raspberryAssetUrls).map(([file, url]) => [file, url]),
-    );
-    const renderer = document.createElement("script");
-    renderer.src = `${import.meta.env.BASE_URL}site-assets/raspberry-studio.js`;
-    renderer.type = "module";
-    renderer.onload = () => {
-      if (cancelled) return;
-      const readyCheck = window.setInterval(() => {
-        const loadingStatus = document.getElementById("loading")?.textContent ?? "";
-        if (document.getElementById("loading")?.classList.contains("done")) {
-          window.clearInterval(readyCheck);
-          setSceneReady(true);
-        } else if (loadingStatus.startsWith("failed to load:")) {
-          window.clearInterval(readyCheck);
-          setSceneError(true);
-        }
-      }, 100);
-      window.setTimeout(() => window.clearInterval(readyCheck), 45_000);
-    };
-    renderer.onerror = () => setSceneError(true);
-    container.appendChild(renderer);
-
-    const timeoutId = window.setTimeout(() => {
-      if (!window.raspberry && !cancelled) setSceneError(true);
-    }, 50_000);
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timeoutId);
-      delete window.__RASPBERRY_ASSETS__;
-      renderer.remove();
-    };
-  }, []);
+function PapayaStudio() {
+  const [isCut, setIsCut] = useState(false);
+  const [warmLight, setWarmLight] = useState(true);
 
   return (
-    <main className="raspberry-studio" ref={containerRef}>
-      <canvas id="app" aria-label="Interactive 3D raspberry lighting studio" />
-      <div id="loading" className={`studio-loading${sceneReady ? " studio-loading--hidden" : ""}`}>
-        <img
-          className="studio-fallback"
-          src={`${import.meta.env.BASE_URL}site-assets/raspberry-reference.webp`}
-          alt="A close-up, photorealistic red raspberry on black"
-          width={640}
-          height={780}
-          fetchPriority="high"
-          decoding="async"
-        />
-        <span>{sceneError ? "3D scene unavailable" : "loading raspberry…"}</span>
-      </div>
-      {sceneError && (
-        <button className="studio-retry" onClick={() => window.location.reload()}>
-          Retry 3D scene
-        </button>
-      )}
+    <main className={`papaya-studio${warmLight ? " papaya-studio--warm" : ""}`}>
+      <header className="papaya-header">
+        <a className="papaya-mark" href="#papaya" aria-label="Papaya studio home">
+          <span className="papaya-mark__dot" />
+          FIELD NOTES <span className="papaya-mark__slash">/</span> FRUIT STUDY
+        </a>
+        <span className="papaya-edition">TROPICAL COLLECTION <span>01 — 04</span></span>
+      </header>
+
+      <section className={`papaya-stage${isCut ? " papaya-stage--cut" : ""}`} id="papaya">
+        <div className="papaya-caption" aria-live="polite">
+          <span className="papaya-eyebrow">CARICA PAPAYA · {isCut ? "INTERIOR" : "RIPE"}</span>
+          <h1>Papaya</h1>
+          <p>{isCut ? "A sun-warmed center, held in seed." : "Color gathered slowly in the sun."}</p>
+        </div>
+        <figure className="papaya-fruit">
+          <img
+            key={isCut ? "cut" : "whole"}
+            src={isCut ? papayaCut : papayaWhole}
+            alt={isCut ? "Two papaya halves showing orange flesh and black seeds" : "A ripe golden-green papaya"}
+            width={1024}
+            height={1280}
+            fetchPriority="high"
+            decoding="async"
+          />
+          <figcaption className="papaya-image-note">{isCut ? "THE OPEN FRUIT" : "HARVEST STUDY · NO. 01"}</figcaption>
+        </figure>
+      </section>
+
+      <footer className="papaya-controls">
+        <div className="papaya-view-toggle" role="group" aria-label="Papaya view">
+          <Button
+            type="button"
+            variant="ghost"
+            className={`papaya-control${!isCut ? " papaya-control--selected" : ""}`}
+            aria-pressed={!isCut}
+            onClick={() => setIsCut(false)}
+          >
+            Whole fruit
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className={`papaya-control${isCut ? " papaya-control--selected" : ""}`}
+            aria-pressed={isCut}
+            onClick={() => setIsCut(true)}
+          >
+            Cut open
+          </Button>
+        </div>
+        <Button
+          type="button"
+          variant="ghost"
+          className="papaya-light-control"
+          aria-pressed={warmLight}
+          onClick={() => setWarmLight((current) => !current)}
+        >
+          <span className="papaya-light-indicator" />
+          {warmLight ? "Warm light" : "Daylight"}
+        </Button>
+        <span className="papaya-footnote">A STUDY IN LIGHT &amp; RIPENESS</span>
+      </footer>
     </main>
   );
 }

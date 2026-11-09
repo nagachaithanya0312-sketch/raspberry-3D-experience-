@@ -29,8 +29,8 @@ use the editor.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
 
-## Imported site rendering
+## Fruit studio rendering
 
-- Keep the Raspberry studio renderer and decoder/media payloads under `public/site-assets`, while route UI and lifecycle remain in React, so the original browser-only scene stays isolated from SSR.
+- Keep the current Papaya studio and its controls in React; retain the Raspberry renderer and payloads under `public/site-assets` as source assets, but do not load them in the Papaya route.
 - GitHub Pages builds must prerender the studio into static output, use the repository base path, and deploy through the official Pages Actions artifact workflow rather than relying on server runtime output.
 - Keep the repository’s GitHub Pages base path in one shared browser-safe constant so the Vite config and its regression test use the same value.
