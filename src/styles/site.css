@@ -206,6 +206,7 @@ body:has(.papaya-studio) {
 
 .papaya-control:hover,
 .papaya-light-control:hover {
+  background: transparent;
   color: var(--papaya-foreground);
 }
 
