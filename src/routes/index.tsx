@@ -8,13 +8,13 @@ import papayaWhole from "@/assets/papaya-whole.jpg";
 const PapayaScene = lazy(() => import("@/components/PapayaScene"));
 
 class PapayaSceneBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
-  state = { hasError: false };
+  override state = { hasError: false };
 
   static getDerivedStateFromError() {
     return { hasError: true };
   }
 
-  render() {
+  override render() {
     if (this.state.hasError) {
       return (
         <div className="papaya-scene-error" role="alert">
