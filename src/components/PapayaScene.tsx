@@ -1,6 +1,6 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Box3, Color, Group, Vector3 } from "three";
 
 const modelPath = `${import.meta.env.BASE_URL}models/papaya.glb`;
@@ -41,10 +41,6 @@ function PapayaModel({ onReady }: { onReady: () => void }) {
   const group = useRef<Group>(null);
   const hasDrawn = useRef(false);
 
-  useEffect(() => {
-    if (group.current) group.current.rotation.z = 0.13;
-  }, []);
-
   useFrame(() => {
     if (!hasDrawn.current) {
       hasDrawn.current = true;
@@ -53,7 +49,7 @@ function PapayaModel({ onReady }: { onReady: () => void }) {
   });
 
   return (
-    <group ref={group}>
+    <group ref={group} rotation={[0, 0, Math.PI / 2 - 0.13]}>
       <group scale={scale} position={[-center.x * scale, -center.y * scale, -center.z * scale]}>
         <primitive object={model} />
       </group>
@@ -79,7 +75,7 @@ export default function PapayaScene({ warmLight, onReady }: PapayaSceneProps) {
     <div className="papaya-scene" aria-label="Interactive 3D papaya. Drag to rotate and use pinch or scroll to zoom.">
       <Canvas
         aria-hidden="true"
-        camera={{ position: [0, 0.08, 5.15], fov: 37 }}
+        camera={{ position: [0, 0.08, 6], fov: 37 }}
         dpr={[1, 1.5]}
         frameloop="demand"
         gl={{ alpha: true, antialias: true, powerPreference: "low-power" }}
