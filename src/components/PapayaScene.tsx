@@ -37,7 +37,7 @@ function PapayaModel({ onReady }: { onReady: () => void }) {
   const bounds = useMemo(() => new Box3().setFromObject(model), [model]);
   const center = useMemo(() => bounds.getCenter(new Vector3()), [bounds]);
   const dimensions = useMemo(() => bounds.getSize(new Vector3()), [bounds]);
-  const scale = 3.65 / Math.max(dimensions.x, dimensions.y, dimensions.z);
+  const scale = 3 / Math.max(dimensions.x, dimensions.y, dimensions.z);
   const group = useRef<Group>(null);
   const hasDrawn = useRef(false);
 
