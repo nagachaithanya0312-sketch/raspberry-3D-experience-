@@ -10,6 +10,9 @@
   --papaya-fill-light: oklch(0.45 0.035 75);
   --papaya-bounce-light: oklch(0.82 0.035 180);
   --papaya-shadow: oklch(0.08 0.01 50);
+  --papaya-flesh: oklch(0.72 0.18 43);
+  --papaya-cavity: oklch(0.42 0.12 39);
+  --papaya-seed: oklch(0.2 0.025 37);
 }
 
 html:has(.papaya-studio),

@@ -189,10 +189,10 @@ function PapayaModel({
     <group ref={group} rotation={[0, 0, 0.13]}>
       <group scale={scale} position={[-center.x * scale, -center.y * scale, -center.z * scale]}>
         <primitive object={model} />
+        {cutaway ? (
+          <PapayaCutaway fleshColor={fleshColor} cavityColor={cavityColor} seedColor={seedColor} />
+        ) : null}
       </group>
-      {cutaway ? (
-        <PapayaCutaway fleshColor={fleshColor} cavityColor={cavityColor} seedColor={seedColor} />
-      ) : null}
     </group>
   );
 }
@@ -234,7 +234,10 @@ export default function PapayaScene({ warmLight, cutaway, onReady }: PapayaScene
   }, [warmLight]);
 
   return (
-    <div className="papaya-scene" aria-label="Interactive 3D papaya. Drag to rotate and use pinch or scroll to zoom.">
+    <div
+      className="papaya-scene"
+      aria-label={`Interactive 3D ${cutaway ? "papaya cutaway" : "whole papaya"}. Drag to rotate and use pinch or scroll to zoom.`}
+    >
       <Canvas
         aria-hidden="true"
         camera={{ position: [0, 0.08, 6], fov: 37 }}
