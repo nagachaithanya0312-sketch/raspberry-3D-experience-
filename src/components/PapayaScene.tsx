@@ -1,7 +1,7 @@
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Box3, Color, Group, SRGBColorSpace, Vector3 } from "three";
+import { Box3, Color, Group, PerspectiveCamera, SRGBColorSpace, Vector3 } from "three";
 
 const modelPath = `${import.meta.env.BASE_URL}models/papaya.glb`;
 const dracoPath = `${import.meta.env.BASE_URL}site-assets/libs/draco/`;
@@ -62,12 +62,28 @@ function PapayaModel({ onReady }: { onReady: () => void }) {
   });
 
   return (
-    <group ref={group} rotation={[0, 0, Math.PI / 2 - 0.13]}>
+    <group ref={group} rotation={[0, 0, 0.13]}>
       <group scale={scale} position={[-center.x * scale, -center.y * scale, -center.z * scale]}>
         <primitive object={model} />
       </group>
     </group>
   );
+}
+
+function ResponsiveFraming() {
+  const { camera, size } = useThree();
+
+  useEffect(() => {
+    if (!(camera instanceof PerspectiveCamera)) return;
+    const aspect = size.width / Math.max(1, size.height);
+    const width = 3.45;
+    const distance = width / (2 * Math.tan((camera.fov * Math.PI) / 360) * aspect);
+    camera.position.set(0, 0.08, Math.max(6, distance));
+    camera.lookAt(0, 0, 0);
+    camera.updateProjectionMatrix();
+  }, [camera, size.height, size.width]);
+
+  return null;
 }
 
 export default function PapayaScene({ warmLight, onReady }: PapayaSceneProps) {
@@ -92,30 +108,22 @@ export default function PapayaScene({ warmLight, onReady }: PapayaSceneProps) {
         dpr={[1, 1.5]}
         frameloop="demand"
         gl={{ alpha: true, antialias: true, powerPreference: "low-power" }}
-        shadows
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
         }}
       >
+        <ResponsiveFraming />
         <ambientLight intensity={0.7} />
         <hemisphereLight args={[keyColor, fillColor, 0.75]} />
         <directionalLight
           color={keyColor}
           position={[-3.5, 5, 4]}
           intensity={warmLight ? 2.2 : 1.85}
-          castShadow
-          shadow-mapSize-width={1024}
-          shadow-mapSize-height={1024}
-          shadow-camera-left={-4}
-          shadow-camera-right={4}
-          shadow-camera-top={4}
-          shadow-camera-bottom={-4}
-          shadow-bias={-0.0002}
         />
         <directionalLight color={bounceColor} position={[4, 0.5, -3]} intensity={0.8} />
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.05, 0]} receiveShadow>
-          <planeGeometry args={[20, 20]} />
-          <shadowMaterial color={shadowColor} transparent opacity={0.08} />
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.83, 0]} scale={[1.05, 0.36, 1]}>
+          <circleGeometry args={[1, 48]} />
+          <meshBasicMaterial color={shadowColor} transparent opacity={0.23} depthWrite={false} />
         </mesh>
         <PapayaModel onReady={handleReady} />
         <OrbitControls
