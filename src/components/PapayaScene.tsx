@@ -1,7 +1,23 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Box3, Color, Group, PerspectiveCamera, SRGBColorSpace, Vector3 } from "three";
+import {
+  Box3,
+  Color,
+  DoubleSide,
+  Group,
+  InstancedMesh,
+  Mesh,
+  MeshBasicMaterial,
+  Object3D,
+  Path,
+  PerspectiveCamera,
+  Shape,
+  ExtrudeGeometry,
+  SphereGeometry,
+  SRGBColorSpace,
+  Vector3,
+} from "three";
 
 const modelPath = `${import.meta.env.BASE_URL}models/papaya.glb`;
 const dracoPath = `${import.meta.env.BASE_URL}site-assets/libs/draco/`;
@@ -11,17 +27,100 @@ useGLTF.preload(modelPath, dracoPath);
 
 interface PapayaSceneProps {
   warmLight: boolean;
+  cutaway: boolean;
   onReady: () => void;
+}
+
+const papayaSeedPositions = Array.from({ length: 28 }, (_, index) => {
+  const angle = index * 2.399963229728653;
+  const radius = Math.sqrt((index + 0.5) / 28);
+
+  return [Math.cos(angle) * radius * 0.56, Math.sin(angle) * radius * 0.22, 0.075] as [number, number, number];
+});
+
+function createPapayaCutFace() {
+  const face = new Shape();
+  face.moveTo(-1.38, -0.03);
+  face.bezierCurveTo(-1.43, 0.48, -0.9, 0.77, -0.2, 0.76);
+  face.bezierCurveTo(0.55, 0.78, 1.25, 0.56, 1.42, 0.2);
+  face.bezierCurveTo(1.52, -0.08, 1.28, -0.4, 0.78, -0.58);
+  face.bezierCurveTo(0.06, -0.83, -0.92, -0.72, -1.32, -0.32);
+  face.bezierCurveTo(-1.4, -0.23, -1.42, -0.12, -1.38, -0.03);
+
+  const cavity = new Path();
+  cavity.absellipse(-0.02, 0.01, 0.69, 0.3, 0, Math.PI * 2, true, 0);
+  face.holes.push(cavity);
+
+  return new ExtrudeGeometry(face, {
+    bevelEnabled: true,
+    bevelSegments: 4,
+    bevelSize: 0.035,
+    bevelThickness: 0.04,
+    curveSegments: 48,
+    depth: 0.38,
+    steps: 1,
+  });
+}
+
+function createPapayaCavity() {
+  const cavity = new Shape();
+  cavity.absellipse(-0.02, 0.01, 0.68, 0.29, 0, Math.PI * 2, false, 0);
+  return new ExtrudeGeometry(cavity, { bevelEnabled: false, curveSegments: 48, depth: 0.035, steps: 1 });
+}
+
+function PapayaCutaway({
+  fleshColor,
+  cavityColor,
+  seedColor,
+}: {
+  fleshColor: Color;
+  cavityColor: Color;
+  seedColor: Color;
+}) {
+  const faceGeometry = useMemo(() => createPapayaCutFace(), []);
+  const cavityGeometry = useMemo(() => createPapayaCavity(), []);
+  const seedGeometry = useMemo(() => new SphereGeometry(1, 14, 10), []);
+  const seedMaterial = useMemo(
+    () => new MeshBasicMaterial({ color: seedColor, toneMapped: false }),
+    [seedColor],
+  );
+  const seeds = useRef<InstancedMesh>(null);
+
+  useLayoutEffect(() => {
+    if (!seeds.current) return;
+
+    const transform = new Object3D();
+    papayaSeedPositions.forEach(([x, y, z], index) => {
+      transform.position.set(x, y, z);
+      const size = 0.052 + (index % 4) * 0.004;
+      transform.scale.set(size, size * 0.92, size * 0.76);
+      transform.updateMatrix();
+      seeds.current?.setMatrixAt(index, transform.matrix);
+    });
+    seeds.current.instanceMatrix.needsUpdate = true;
+  }, []);
+
+  return (
+    <group>
+      <mesh geometry={faceGeometry} position={[0, 0, 0.006]}>
+        <meshBasicMaterial color={fleshColor} side={DoubleSide} toneMapped={false} />
+      </mesh>
+      <mesh geometry={cavityGeometry} position={[0, 0, 0.014]}>
+        <meshBasicMaterial color={cavityColor} toneMapped={false} />
+      </mesh>
+      <instancedMesh ref={seeds} args={[seedGeometry, seedMaterial, papayaSeedPositions.length]} />
+    </group>
+  );
 }
 
 function readStudioLight(token: string) {
   const colorValue = getComputedStyle(document.documentElement).getPropertyValue(token).trim();
-  const values = colorValue.match(/oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)/);
+  const values = colorValue.match(/oklch\(\s*([\d.]+)(%)?\s+([\d.]+)(%)?\s+([\d.]+)/);
   if (!values) return new Color();
 
-  const lightness = Number(values[1]);
-  const chroma = Number(values[2]);
-  const hue = (Number(values[3]) * Math.PI) / 180;
+  const lightness = Number(values[1]) / (values[2] ? 100 : 1);
+  const chroma = Number(values[3]) * (values[4] ? 0.004 : 1);
+  const hue = (Number(values[5]) * Math.PI) / 180;
   const a = chroma * Math.cos(hue);
   const b = chroma * Math.sin(hue);
   const l = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3;
@@ -35,25 +134,42 @@ function readStudioLight(token: string) {
   return new Color().setRGB(red, green, blue, SRGBColorSpace);
 }
 
-function PapayaModel({ onReady }: { onReady: () => void }) {
+function PapayaModel({
+  cutaway,
+  fleshColor,
+  cavityColor,
+  seedColor,
+  onReady,
+}: {
+  cutaway: boolean;
+  fleshColor: Color;
+  cavityColor: Color;
+  seedColor: Color;
+  onReady: () => void;
+}) {
   const { scene } = useGLTF(modelPath, dracoPath);
   const { size } = useThree();
   const model = useMemo(() => {
     const copy = scene.clone(true);
+    copy.visible = !cutaway;
     copy.traverse((item) => {
-      if ("isMesh" in item && item.isMesh) {
+      if (item instanceof Mesh) {
         item.castShadow = true;
         item.receiveShadow = true;
       }
     });
     return copy;
-  }, [scene]);
+  }, [cutaway, scene]);
   const bounds = useMemo(() => new Box3().setFromObject(model), [model]);
   const center = useMemo(() => bounds.getCenter(new Vector3()), [bounds]);
   const dimensions = useMemo(() => bounds.getSize(new Vector3()), [bounds]);
   const scale = 3 / Math.max(dimensions.x, dimensions.y, dimensions.z);
   const group = useRef<Group>(null);
   const hasDrawn = useRef(false);
+
+  useLayoutEffect(() => {
+    hasDrawn.current = false;
+  }, [cutaway]);
 
   useLayoutEffect(() => {
     if (!group.current) return;
@@ -72,6 +188,9 @@ function PapayaModel({ onReady }: { onReady: () => void }) {
       <group scale={scale} position={[-center.x * scale, -center.y * scale, -center.z * scale]}>
         <primitive object={model} />
       </group>
+      {cutaway ? (
+        <PapayaCutaway fleshColor={fleshColor} cavityColor={cavityColor} seedColor={seedColor} />
+      ) : null}
     </group>
   );
 }
@@ -92,11 +211,14 @@ function ResponsiveFraming() {
   return null;
 }
 
-export default function PapayaScene({ warmLight, onReady }: PapayaSceneProps) {
+export default function PapayaScene({ warmLight, cutaway, onReady }: PapayaSceneProps) {
   const [keyColor, setKeyColor] = useState<Color>(() => new Color());
   const [fillColor, setFillColor] = useState<Color>(() => new Color());
   const [bounceColor, setBounceColor] = useState<Color>(() => new Color());
   const [shadowColor, setShadowColor] = useState<Color>(() => new Color());
+  const [fleshColor, setFleshColor] = useState<Color>(() => new Color());
+  const [cavityColor, setCavityColor] = useState<Color>(() => new Color());
+  const [seedColor, setSeedColor] = useState<Color>(() => new Color());
   const handleReady = useCallback(() => onReady(), [onReady]);
 
   useEffect(() => {
@@ -104,10 +226,16 @@ export default function PapayaScene({ warmLight, onReady }: PapayaSceneProps) {
     setFillColor(readStudioLight("--papaya-fill-light"));
     setBounceColor(readStudioLight("--papaya-bounce-light"));
     setShadowColor(readStudioLight("--papaya-shadow"));
+    setFleshColor(readStudioLight("--papaya-flesh"));
+    setCavityColor(readStudioLight("--papaya-cavity"));
+    setSeedColor(readStudioLight("--papaya-seed"));
   }, [warmLight]);
 
   return (
-    <div className="papaya-scene" aria-label="Interactive 3D papaya. Drag to rotate and use pinch or scroll to zoom.">
+    <div
+      className="papaya-scene"
+      aria-label={`Interactive 3D ${cutaway ? "papaya cutaway" : "whole papaya"}. Drag to rotate and use pinch or scroll to zoom.`}
+    >
       <Canvas
         aria-hidden="true"
         camera={{ position: [0, 0.08, 6], fov: 37 }}
@@ -131,7 +259,13 @@ export default function PapayaScene({ warmLight, onReady }: PapayaSceneProps) {
           <circleGeometry args={[1, 48]} />
           <meshBasicMaterial color={shadowColor} transparent opacity={0.23} depthWrite={false} />
         </mesh>
-        <PapayaModel onReady={handleReady} />
+        <PapayaModel
+          cutaway={cutaway}
+          fleshColor={fleshColor}
+          cavityColor={cavityColor}
+          seedColor={seedColor}
+          onReady={handleReady}
+        />
         <OrbitControls
           makeDefault
           enableDamping
