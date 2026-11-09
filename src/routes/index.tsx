@@ -73,7 +73,10 @@ function PapayaStudio() {
             />
           ) : (
             <div className="papaya-model-view" data-scene-ready={sceneReady ? "true" : undefined}>
-              <div className={`papaya-model-fallback${sceneReady ? " papaya-model-fallback--hidden" : ""}`}>
+              <div
+                className={`papaya-model-fallback${sceneReady ? " papaya-model-fallback--hidden" : ""}`}
+                aria-hidden={sceneReady}
+              >
                 <img src={papayaWhole} alt="" width={1024} height={1280} fetchPriority="high" decoding="async" />
                 <span className="papaya-model-loading" aria-live="polite">
                   {sceneReady ? "" : "Preparing specimen"}
