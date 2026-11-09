@@ -187,10 +187,10 @@ function PapayaModel({
     <group ref={group} rotation={[0, 0, 0.13]}>
       <group scale={scale} position={[-center.x * scale, -center.y * scale, -center.z * scale]}>
         <primitive object={model} />
-        {cutaway ? (
-          <PapayaCutaway fleshColor={fleshColor} cavityColor={cavityColor} seedColor={seedColor} />
-        ) : null}
       </group>
+      {cutaway ? (
+        <PapayaCutaway fleshColor={fleshColor} cavityColor={cavityColor} seedColor={seedColor} />
+      ) : null}
     </group>
   );
 }
