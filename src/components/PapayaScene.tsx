@@ -7,7 +7,7 @@ import {
   Group,
   InstancedMesh,
   Mesh,
-  MeshStandardMaterial,
+  MeshBasicMaterial,
   Object3D,
   Path,
   PerspectiveCamera,
@@ -74,7 +74,7 @@ function PapayaCutaway({
   const cavityGeometry = useMemo(() => createPapayaCavity(), []);
   const seedGeometry = useMemo(() => new SphereGeometry(1, 14, 10), []);
   const seedMaterial = useMemo(
-    () => new MeshStandardMaterial({ color: seedColor, roughness: 0.3, metalness: 0.02 }),
+    () => new MeshBasicMaterial({ color: seedColor, toneMapped: false }),
     [seedColor],
   );
   const seeds = useRef<InstancedMesh>(null);
@@ -95,10 +95,10 @@ function PapayaCutaway({
   return (
     <group>
       <mesh geometry={faceGeometry} position={[0, 0, 0.006]}>
-        <meshStandardMaterial color={fleshColor} roughness={0.76} side={2} />
+        <meshBasicMaterial color={fleshColor} side={2} toneMapped={false} />
       </mesh>
       <mesh geometry={cavityGeometry} position={[0, 0, 0.014]}>
-        <meshStandardMaterial color={cavityColor} roughness={0.9} />
+        <meshBasicMaterial color={cavityColor} toneMapped={false} />
       </mesh>
       <instancedMesh ref={seeds} args={[seedGeometry, seedMaterial, papayaSeedPositions.length]} />
     </group>
@@ -189,8 +189,10 @@ function PapayaModel({
     <group ref={group} rotation={[0, 0, 0.13]}>
       <group scale={scale} position={[-center.x * scale, -center.y * scale, -center.z * scale]}>
         <primitive object={model} />
+        {cutaway ? (
+          <PapayaCutaway fleshColor={fleshColor} cavityColor={cavityColor} seedColor={seedColor} />
+        ) : null}
       </group>
-      {cutaway ? <PapayaCutaway fleshColor={fleshColor} cavityColor={cavityColor} seedColor={seedColor} /> : null}
     </group>
   );
 }
