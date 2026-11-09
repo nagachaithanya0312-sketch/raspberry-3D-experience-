@@ -1,7 +1,8 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Box3, Color, Group, PerspectiveCamera, SRGBColorSpace, Vector3 } from "three";
+import { useThree } from "@react-three/fiber";
 
 const modelPath = `${import.meta.env.BASE_URL}models/papaya.glb`;
 const dracoPath = `${import.meta.env.BASE_URL}site-assets/libs/draco/`;
@@ -37,6 +38,7 @@ function readStudioLight(token: string) {
 
 function PapayaModel({ onReady }: { onReady: () => void }) {
   const { scene } = useGLTF(modelPath, dracoPath);
+  const { size } = useThree();
   const model = useMemo(() => {
     const copy = scene.clone(true);
     copy.traverse((item) => {
@@ -53,6 +55,11 @@ function PapayaModel({ onReady }: { onReady: () => void }) {
   const scale = 3 / Math.max(dimensions.x, dimensions.y, dimensions.z);
   const group = useRef<Group>(null);
   const hasDrawn = useRef(false);
+
+  useLayoutEffect(() => {
+    if (!group.current) return;
+    group.current.rotation.z = size.width / Math.max(1, size.height) < 0.78 ? Math.PI / 2 - 0.13 : 0.13;
+  }, [size.height, size.width]);
 
   useFrame(() => {
     if (!hasDrawn.current) {
