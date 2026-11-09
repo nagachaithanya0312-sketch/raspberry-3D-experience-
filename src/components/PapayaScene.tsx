@@ -2,7 +2,6 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Box3, Color, Group, PerspectiveCamera, SRGBColorSpace, Vector3 } from "three";
-import { useThree } from "@react-three/fiber";
 
 const modelPath = `${import.meta.env.BASE_URL}models/papaya.glb`;
 const dracoPath = `${import.meta.env.BASE_URL}site-assets/libs/draco/`;
