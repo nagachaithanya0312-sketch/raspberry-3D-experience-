@@ -42,7 +42,7 @@ function PapayaModel({ onReady }: { onReady: () => void }) {
   const hasDrawn = useRef(false);
 
   useEffect(() => {
-    if (group.current) group.current.rotation.z = -0.13;
+    if (group.current) group.current.rotation.z = Math.PI / 2 - 0.13;
   }, []);
 
   useFrame(() => {

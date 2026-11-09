@@ -5,6 +5,8 @@
   --papaya-line: oklch(0.36 0.02 76);
   --papaya-accent: oklch(0.78 0.16 66);
   --papaya-green: oklch(0.68 0.08 135);
+  --papaya-key-light: oklch(0.97 0.045 78);
+  --papaya-daylight: oklch(0.97 0.025 190);
 }
 
 html:has(.papaya-studio),
