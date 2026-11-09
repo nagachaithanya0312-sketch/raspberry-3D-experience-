@@ -7,6 +7,9 @@
   --papaya-green: oklch(0.68 0.08 135);
   --papaya-key-light: oklch(0.97 0.045 78);
   --papaya-daylight: oklch(0.97 0.025 190);
+  --papaya-fill-light: oklch(0.45 0.035 75);
+  --papaya-bounce-light: oklch(0.82 0.035 180);
+  --papaya-shadow: oklch(0.08 0.01 50);
 }
 
 html:has(.papaya-studio),
@@ -186,6 +189,10 @@ body:has(.papaya-studio) {
   color: var(--papaya-muted);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.62rem;
+}
+
+.papaya-model-fallback--hidden .papaya-model-loading {
+  visibility: hidden;
 }
 
 .papaya-scene-placeholder {

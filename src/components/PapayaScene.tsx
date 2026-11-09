@@ -42,7 +42,7 @@ function PapayaModel({ onReady }: { onReady: () => void }) {
   const hasDrawn = useRef(false);
 
   useEffect(() => {
-    if (group.current) group.current.rotation.z = Math.PI / 2 - 0.13;
+    if (group.current) group.current.rotation.z = 0.13;
   }, []);
 
   useFrame(() => {
@@ -62,18 +62,24 @@ function PapayaModel({ onReady }: { onReady: () => void }) {
 }
 
 export default function PapayaScene({ warmLight, onReady }: PapayaSceneProps) {
-  const [keyColor, setKeyColor] = useState<Color>(() => new Color("#ffffff"));
+  const [keyColor, setKeyColor] = useState<Color>(() => new Color());
+  const [fillColor, setFillColor] = useState<Color>(() => new Color());
+  const [bounceColor, setBounceColor] = useState<Color>(() => new Color());
+  const [shadowColor, setShadowColor] = useState<Color>(() => new Color());
   const handleReady = useCallback(() => onReady(), [onReady]);
 
   useEffect(() => {
     setKeyColor(readStudioLight(warmLight ? "--papaya-key-light" : "--papaya-daylight"));
+    setFillColor(readStudioLight("--papaya-fill-light"));
+    setBounceColor(readStudioLight("--papaya-bounce-light"));
+    setShadowColor(readStudioLight("--papaya-shadow"));
   }, [warmLight]);
 
   return (
     <div className="papaya-scene" aria-label="Interactive 3D papaya. Drag to rotate and use pinch or scroll to zoom.">
       <Canvas
         aria-hidden="true"
-        camera={{ position: [0, 0.35, 6.1], fov: 37 }}
+        camera={{ position: [0, 0.08, 5.15], fov: 37 }}
         dpr={[1, 1.5]}
         frameloop="demand"
         gl={{ alpha: true, antialias: true, powerPreference: "low-power" }}
@@ -83,7 +89,7 @@ export default function PapayaScene({ warmLight, onReady }: PapayaSceneProps) {
         }}
       >
         <ambientLight intensity={1.25} />
-        <hemisphereLight args={[keyColor, new Color("#514131"), 1.45]} />
+        <hemisphereLight args={[keyColor, fillColor, 1.45]} />
         <directionalLight
           color={keyColor}
           position={[-3.5, 5, 4]}
@@ -97,10 +103,10 @@ export default function PapayaScene({ warmLight, onReady }: PapayaSceneProps) {
           shadow-camera-bottom={-4}
           shadow-bias={-0.0002}
         />
-        <directionalLight color="#d9f0ea" position={[4, 0.5, -3]} intensity={1.1} />
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.28, 0]} receiveShadow>
+        <directionalLight color={bounceColor} position={[4, 0.5, -3]} intensity={1.1} />
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.05, 0]} receiveShadow>
           <planeGeometry args={[200, 200]} />
-          <shadowMaterial transparent opacity={0.19} />
+          <shadowMaterial color={shadowColor} transparent opacity={0.19} />
         </mesh>
         <PapayaModel onReady={handleReady} />
         <OrbitControls
