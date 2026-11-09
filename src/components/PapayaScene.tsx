@@ -115,12 +115,12 @@ function PapayaCutaway({
 
 function readStudioLight(token: string) {
   const colorValue = getComputedStyle(document.documentElement).getPropertyValue(token).trim();
-  const values = colorValue.match(/oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)/);
+  const values = colorValue.match(/oklch\(\s*([\d.]+)(%)?\s+([\d.]+)(%)?\s+([\d.]+)/);
   if (!values) return new Color();
 
-  const lightness = Number(values[1]);
-  const chroma = Number(values[2]);
-  const hue = (Number(values[3]) * Math.PI) / 180;
+  const lightness = Number(values[1]) / (values[2] ? 100 : 1);
+  const chroma = Number(values[3]) * (values[4] ? 0.004 : 1);
+  const hue = (Number(values[5]) * Math.PI) / 180;
   const a = chroma * Math.cos(hue);
   const b = chroma * Math.sin(hue);
   const l = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3;
