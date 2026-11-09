@@ -57,7 +57,7 @@ function PapayaModel({ onReady }: { onReady: () => void }) {
 
   useLayoutEffect(() => {
     if (!group.current) return;
-    group.current.rotation.z = size.width / Math.max(1, size.height) < 0.78 ? Math.PI / 2 - 0.13 : 0.13;
+    group.current.rotation.z = size.width / Math.max(1, size.height) < 0.9 ? Math.PI / 2 - 0.13 : 0.13;
   }, [size.height, size.width]);
 
   useFrame(() => {
