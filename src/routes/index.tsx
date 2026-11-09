@@ -1,11 +1,34 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ClientOnly } from "@tanstack/react-router";
-import { lazy, Suspense, useCallback, useState } from "react";
+import { Component, lazy, Suspense, useCallback, useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import papayaWhole from "@/assets/papaya-whole.jpg";
 
 const PapayaScene = lazy(() => import("@/components/PapayaScene"));
+
+class PapayaSceneBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  override state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  override render() {
+    if (this.state.hasError) {
+      return (
+        <div className="papaya-scene-error" role="alert">
+          <p>The 3D specimen could not load.</p>
+          <Button type="button" variant="ghost" className="papaya-scene-retry" onClick={() => window.location.reload()}>
+            Retry 3D view
+          </Button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -70,11 +93,13 @@ function PapayaStudio() {
                 {sceneReady ? "" : "Preparing specimen"}
               </span>
             </div>
-            <ClientOnly fallback={<div className="papaya-scene-placeholder" aria-hidden="true" />}>
-              <Suspense fallback={<div className="papaya-scene-placeholder" aria-hidden="true" />}>
-                <PapayaScene warmLight={warmLight} cutaway={isCut} onReady={handleSceneReady} />
-              </Suspense>
-            </ClientOnly>
+            <PapayaSceneBoundary>
+              <ClientOnly fallback={<div className="papaya-scene-placeholder" aria-hidden="true" />}>
+                <Suspense fallback={<div className="papaya-scene-placeholder" aria-hidden="true" />}>
+                  <PapayaScene warmLight={warmLight} cutaway={isCut} onReady={handleSceneReady} />
+                </Suspense>
+              </ClientOnly>
+            </PapayaSceneBoundary>
           </div>
           <figcaption className="papaya-image-note">{isCut ? "THE OPEN FRUIT" : "HARVEST STUDY · NO. 01"}</figcaption>
         </figure>
