@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import {
   Box3,
   Color,
+  DoubleSide,
   Group,
   InstancedMesh,
   Mesh,
@@ -11,9 +12,8 @@ import {
   Object3D,
   Path,
   PerspectiveCamera,
-  Plane,
   Shape,
-  ShapeGeometry,
+  ExtrudeGeometry,
   SphereGeometry,
   SRGBColorSpace,
   Vector3,
@@ -51,13 +51,21 @@ function createPapayaCutFace() {
   cavity.absellipse(-0.02, 0.01, 0.69, 0.3, 0, Math.PI * 2, true, 0);
   face.holes.push(cavity);
 
-  return new ShapeGeometry(face, 48);
+  return new ExtrudeGeometry(face, {
+    bevelEnabled: true,
+    bevelSegments: 4,
+    bevelSize: 0.035,
+    bevelThickness: 0.04,
+    curveSegments: 48,
+    depth: 0.38,
+    steps: 1,
+  });
 }
 
 function createPapayaCavity() {
   const cavity = new Shape();
   cavity.absellipse(-0.02, 0.01, 0.68, 0.29, 0, Math.PI * 2, false, 0);
-  return new ShapeGeometry(cavity, 48);
+  return new ExtrudeGeometry(cavity, { bevelEnabled: false, curveSegments: 48, depth: 0.035, steps: 1 });
 }
 
 function PapayaCutaway({
@@ -95,7 +103,7 @@ function PapayaCutaway({
   return (
     <group>
       <mesh geometry={faceGeometry} position={[0, 0, 0.006]}>
-        <meshBasicMaterial color={fleshColor} side={2} toneMapped={false} />
+        <meshBasicMaterial color={fleshColor} side={DoubleSide} toneMapped={false} />
       </mesh>
       <mesh geometry={cavityGeometry} position={[0, 0, 0.014]}>
         <meshBasicMaterial color={cavityColor} toneMapped={false} />
@@ -143,21 +151,11 @@ function PapayaModel({
   const { size } = useThree();
   const model = useMemo(() => {
     const copy = scene.clone(true);
-    const clippingPlane = new Plane(new Vector3(0, 0, -1), 0);
+    copy.visible = !cutaway;
     copy.traverse((item) => {
       if (item instanceof Mesh) {
         item.castShadow = true;
         item.receiveShadow = true;
-
-        const materials = Array.isArray(item.material)
-          ? item.material.map((material) => material.clone())
-          : item.material.clone();
-        const clonedMaterials = Array.isArray(materials) ? materials : [materials];
-        clonedMaterials.forEach((material) => {
-          material.clippingPlanes = cutaway ? [clippingPlane] : [];
-          material.needsUpdate = true;
-        });
-        item.material = materials;
       }
     });
     return copy;
@@ -246,7 +244,6 @@ export default function PapayaScene({ warmLight, cutaway, onReady }: PapayaScene
         gl={{ alpha: true, antialias: true, powerPreference: "low-power" }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
-          gl.localClippingEnabled = true;
         }}
       >
         <ResponsiveFraming />
